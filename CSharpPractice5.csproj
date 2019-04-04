@@ -60,6 +60,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Tools\ComputerHelper.cs" />
     <Compile Include="ViewModels\ProcessListViewModel.cs" />
     <Compile Include="Views\ProcessListView.xaml.cs">
       <DependentUpon>ProcessListView.xaml</DependentUpon>
@@ -109,8 +110,6 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Tools\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

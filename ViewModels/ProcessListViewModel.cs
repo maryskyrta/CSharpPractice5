@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 using CSharpPractice5.Models;
+using CSharpPractice5.Tools;
 
 namespace CSharpPractice5.ViewModels
 {
@@ -28,6 +29,8 @@ namespace CSharpPractice5.ViewModels
         
         public ProcessListViewModel()
         {
+
+            ComputerHelper.Initialize();
             _processes = new ObservableCollection<SystemProcess>();
             FillProcesses();
         }
