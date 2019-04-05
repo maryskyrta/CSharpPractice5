@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -18,6 +17,7 @@ namespace CSharpPractice5.ViewModels
 
         #region Fields
 
+        private string _sortBy;
         private ObservableCollection<SystemProcess> _processes;
         private RelayCommand<object> _terminateProcess;
         private Task _listRefreshTask;
@@ -29,6 +29,11 @@ namespace CSharpPractice5.ViewModels
 
         #region Properties
 
+        public SystemProcess SelectedProcess { get; set; }
+
+        public static List<string> SortFields { get; } = new List<string> { "Name", "Id", "Active", "CPU%", "Memory%", "Memory usage", "Threads", "User", "File name", "File path", "Start time", "No sort" };
+
+
         public ObservableCollection<SystemProcess> Processes
         {
             get { return _processes; }
@@ -39,13 +44,24 @@ namespace CSharpPractice5.ViewModels
             }
         }
 
+        public string SortBy
+        {
+            get { return _sortBy; }
+            set
+            {
+                _sortBy = value;
+                var sorted = _processes.ToList();
+                SortProcesses(ref sorted);
+                Processes = new ObservableCollection<SystemProcess>(sorted);
+            }
+        }
+
         public RelayCommand<object> TerminateProcessCommand
         {
             get { return _terminateProcess ?? (_terminateProcess = new RelayCommand<object>(TerminateProcess, CanTerminateProcess)); }
         }
 
-        public SystemProcess SelectedProcess { get; set; }
-
+        
         
 
         #endregion
@@ -53,7 +69,7 @@ namespace CSharpPractice5.ViewModels
 
         #region Constructor
 
-        
+
         public ProcessListViewModel()
         {
             ComputerHelper.Initialize();
@@ -73,25 +89,7 @@ namespace CSharpPractice5.ViewModels
 
 
         #region Helping functions
-
-
-        //private void FillProcesses(ObservableCollection<SystemProcess> processes)
-        //{
-        //    var pros = Process.GetProcesses();
-        //    try
-        //    {
-        //        foreach (var process in pros)
-        //        {
-
-        //            processes.Add(new SystemProcess(process));
-        //        }
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        MessageBox.Show(e.Message);
-        //    }
-        //}
-
+        
 
         private void TerminateProcess(object obj)
         {
@@ -117,6 +115,7 @@ namespace CSharpPractice5.ViewModels
             {
                 var pros = Process.GetProcesses();
                 var processes = pros.Select(process => new SystemProcess(process)).ToList();
+                SortProcesses(ref processes);
                 Processes = new ObservableCollection<SystemProcess>(processes);
                 //for (int j = 0; j < 3; j++)
                 //{
@@ -148,6 +147,7 @@ namespace CSharpPractice5.ViewModels
                 {
                     process.Refresh();
                 }
+                SortProcesses(ref pros);
                 Processes = new ObservableCollection<SystemProcess>(pros);
                 //for (int j = 0; j < 3; j++)
                 //{
@@ -172,12 +172,75 @@ namespace CSharpPractice5.ViewModels
         internal void StopBackgroundTasks()
         {
             _tokenSource.Cancel();
-            _listRefreshTask.Wait(2000);
+            _listRefreshTask.Wait(5000);
             _listRefreshTask.Dispose();
             _processesRefreshTask.Wait(2000);
             _processesRefreshTask.Dispose();
             _listRefreshTask = null;
             _processesRefreshTask = null;
+        }
+
+        private void SortProcesses(ref List<SystemProcess> processes)
+        {
+            switch (_sortBy)
+            {
+                case "Name":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.Name
+                        select process);
+                    break;
+                case "Id":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.Id
+                        select process);
+                    break;
+                case "Active":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.IsActive
+                        select process);
+                    break;
+                case "CPU%":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.CpuPercent
+                        select process);
+                    break;
+                case "Memory%":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.MemoryPercent
+                        select process);
+                    break;
+                case "Memory usage":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.MemoryVolume
+                        select process);
+                    break;
+                case "Threads":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.Threads
+                        select process);
+                    break;
+                case "User":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.UserName
+                        select process);
+                    break;
+                case "File name":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.FileName
+                        select process);
+                    break;
+                case "File path":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.FilePath
+                        select process);
+                    break;
+                case "Start time":
+                    processes = new List<SystemProcess>(from process in processes
+                        orderby process.StartTime
+                        select process);
+                    break;
+            }
+
         }
 
         #endregion

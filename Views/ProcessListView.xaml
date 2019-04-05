@@ -8,10 +8,15 @@
              d:DesignHeight="550" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="10*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
+        <StackPanel CanVerticallyScroll="True">
+            <TextBlock Margin="0 5" Text ="Sort by" FontSize="15" HorizontalAlignment="Center"></TextBlock>
+            <ComboBox Margin="0 5"  IsEditable="False" FontSize="15" Background="White" Foreground="MidnightBlue"  ItemsSource="{Binding SortFields, Mode=OneWay}" IsReadOnly="true" MaxWidth="150" Text ="{Binding SortBy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+            </ComboBox>
+        </StackPanel>
         <DataGrid Grid.Row="1" IsReadOnly="True"  ItemsSource="{Binding Processes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" ColumnWidth ="*"  AutoGenerateColumns="False" SelectedItem ="{Binding SelectedProcess, Mode = TwoWay}" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Width="Auto"  Binding="{Binding Name}"></DataGridTextColumn>
@@ -27,6 +32,6 @@
                 <DataGridTextColumn Header="Started" Width="Auto" Binding="{Binding StartTime}"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <Button Grid.Row="2" Content ="Terminate" MinWidth="120" Padding="10, 0" FontSize="14" HorizontalAlignment ="Center" Margin="0,5" Command ="{Binding TerminateProcessCommand}" Background="WhiteSmoke" Foreground="MidnightBlue"></Button>
+        <Button Grid.Row="2" Content ="Terminate" MinWidth="120" Padding="10 0" FontSize="14" HorizontalAlignment ="Center" Margin="0 5" Command ="{Binding TerminateProcessCommand}" Background="WhiteSmoke" Foreground="MidnightBlue"></Button>
     </Grid>
 </UserControl>

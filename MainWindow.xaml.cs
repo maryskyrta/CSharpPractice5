@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using CSharpPractice5.Tools;
 
 namespace CSharpPractice5
@@ -11,6 +12,12 @@ namespace CSharpPractice5
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            base.OnClosing(e);
+            StationManager.CloseApp();
         }
     }
 }

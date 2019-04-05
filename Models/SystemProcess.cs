@@ -127,9 +127,17 @@ namespace CSharpPractice5.Models
 
         public void Refresh()
         {
-            MemoryVolume = Convert.ToInt32(_memoryCounter.NextValue()) / (int) (1024 * 1024);
-            MemoryPercent = Math.Round((MemoryVolume / ComputerHelper.TotalRAM) * 100,2);
-            CpuPercent = Convert.ToInt32(_cpuCounter.NextValue()/Environment.ProcessorCount);
+            try
+            {
+                MemoryVolume = Convert.ToInt32(_memoryCounter.NextValue()) / (int) (1024 * 1024);
+                MemoryPercent = Math.Round((MemoryVolume / ComputerHelper.TotalRAM) * 100, 2);
+                CpuPercent = Convert.ToInt32(_cpuCounter.NextValue() / Environment.ProcessorCount);
+            }
+            catch(System.InvalidOperationException)
+            {
+
+            }
+
             Threads = _process.Threads.Count;
         }
         
