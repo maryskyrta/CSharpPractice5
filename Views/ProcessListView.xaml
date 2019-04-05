@@ -17,7 +17,7 @@
             <ComboBox Margin="0 5"  IsEditable="False" FontSize="15" Background="White" Foreground="MidnightBlue"  ItemsSource="{Binding SortFields, Mode=OneWay}" IsReadOnly="true" MaxWidth="150" Text ="{Binding SortBy, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
             </ComboBox>
         </StackPanel>
-        <DataGrid Grid.Row="1" IsReadOnly="True"  ItemsSource="{Binding Processes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" ColumnWidth ="*"  AutoGenerateColumns="False" SelectedItem ="{Binding SelectedProcess, Mode = TwoWay}" >
+        <DataGrid Grid.Row="1" IsReadOnly="True"  ItemsSource="{Binding Processes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" ColumnWidth ="*"  AutoGenerateColumns="False" SelectedItem ="{Binding SelectedProcess, Mode = TwoWay, UpdateSourceTrigger=PropertyChanged}" >
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Name" Width="Auto"  Binding="{Binding Name}"></DataGridTextColumn>
                 <DataGridTextColumn Header="id" Binding="{Binding Id}"></DataGridTextColumn>

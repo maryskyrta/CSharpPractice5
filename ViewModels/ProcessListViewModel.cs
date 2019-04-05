@@ -19,19 +19,28 @@ namespace CSharpPractice5.ViewModels
 
         private string _sortBy;
         private ObservableCollection<SystemProcess> _processes;
+        private SystemProcess _selectedProcess;
         private RelayCommand<object> _terminateProcess;
         private Task _listRefreshTask;
         private Task _processesRefreshTask;
-        private CancellationToken _token;
-        private CancellationTokenSource _tokenSource;
+        private readonly CancellationToken _token;
+        private readonly CancellationTokenSource _tokenSource;
 
         #endregion
 
         #region Properties
 
-        public SystemProcess SelectedProcess { get; set; }
+        public SystemProcess SelectedProcess
+        {
+            get { return _selectedProcess;}
+            set
+            {
+                _selectedProcess = value;
+                OnPropertyChanged();
+            }
+        }
 
-        public static List<string> SortFields { get; } = new List<string> { "Name", "Id", "Active", "CPU%", "Memory%", "Memory usage", "Threads", "User", "File name", "File path", "Start time", "No sort" };
+        public static List<string> SortFields { get; } = new List<string> { "Name", "Id", "Active", "CPU%", "Memory%", "Memory usage", "Threads", "User", "File name", "File path", "Start time" };
 
 
         public ObservableCollection<SystemProcess> Processes
@@ -117,6 +126,20 @@ namespace CSharpPractice5.ViewModels
                 var processes = pros.Select(process => new SystemProcess(process)).ToList();
                 SortProcesses(ref processes);
                 Processes = new ObservableCollection<SystemProcess>(processes);
+                if (_selectedProcess != null)
+                {
+                    // MessageBox.Show($"{_selectedProcess.Id}");
+                    var selected = new List<SystemProcess>(from process in processes
+                        where process.Id == _selectedProcess.Id
+                        select process);
+                    if (selected.Count == 0)
+                        SelectedProcess = null;
+                    else
+                    {
+                        SelectedProcess = selected.First();
+                        MessageBox.Show($"{_selectedProcess.Id}");
+                    }
+                }
                 //for (int j = 0; j < 3; j++)
                 //{
                 //    Thread.Sleep(500);
@@ -240,7 +263,6 @@ namespace CSharpPractice5.ViewModels
                         select process);
                     break;
             }
-
         }
 
         #endregion
