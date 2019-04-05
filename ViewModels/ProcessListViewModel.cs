@@ -48,7 +48,20 @@ namespace CSharpPractice5.ViewModels
             get { return _processes; }
             set
             {
+                var id = -1;
+                if (SelectedProcess != null)
+                {
+                    id = SelectedProcess.Id;
+                }
                 _processes = value;
+                if (id > 0)
+                {
+                    var selected = new List<SystemProcess>(from process in _processes
+                                                           where process.Id == id
+                                                           select process);
+                    var selItem = selected.Count == 0 ? null : selected.First();
+                    SelectedProcess = selItem;
+                }
                 OnPropertyChanged();
             }
         }
@@ -126,26 +139,6 @@ namespace CSharpPractice5.ViewModels
                 var processes = pros.Select(process => new SystemProcess(process)).ToList();
                 SortProcesses(ref processes);
                 Processes = new ObservableCollection<SystemProcess>(processes);
-                if (_selectedProcess != null)
-                {
-                    // MessageBox.Show($"{_selectedProcess.Id}");
-                    var selected = new List<SystemProcess>(from process in processes
-                        where process.Id == _selectedProcess.Id
-                        select process);
-                    if (selected.Count == 0)
-                        SelectedProcess = null;
-                    else
-                    {
-                        SelectedProcess = selected.First();
-                        MessageBox.Show($"{_selectedProcess.Id}");
-                    }
-                }
-                //for (int j = 0; j < 3; j++)
-                //{
-                //    Thread.Sleep(500);
-                //    if (_token.IsCancellationRequested)
-                //        break;
-                //}
                 if (_token.IsCancellationRequested)
                     break;
                 for (int j = 0; j < 10; j++)
@@ -172,12 +165,6 @@ namespace CSharpPractice5.ViewModels
                 }
                 SortProcesses(ref pros);
                 Processes = new ObservableCollection<SystemProcess>(pros);
-                //for (int j = 0; j < 3; j++)
-                //{
-                //    Thread.Sleep(500);
-                //    if (_token.IsCancellationRequested)
-                //        break;
-                //}
                 if (_token.IsCancellationRequested)
                     break;
                 for (int j = 0; j < 4; j++)
@@ -262,6 +249,8 @@ namespace CSharpPractice5.ViewModels
                         orderby process.StartTime
                         select process);
                     break;
+                default:
+                    return;
             }
         }
 
