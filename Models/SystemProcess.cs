@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
-using System.Windows;
 using CSharpPractice5.Tools;
 
 namespace CSharpPractice5.Models
@@ -11,16 +10,9 @@ namespace CSharpPractice5.Models
     {
         #region Fields
 
-        private Process _process;
-        private string _name;
-        private int _id;
-        private double _cpuPercent;
-        private double _memoryPercent;
-        private double _memoryVolume;
-        private readonly string _userName;
-        private readonly string _fileName;
-        private readonly string _filePath;
-        private readonly DateTime _startTime;
+        private readonly Process _process;
+        private readonly PerformanceCounter _memoryCounter;
+        private readonly PerformanceCounter _cpuCounter;
 
 
         #endregion
@@ -28,18 +20,10 @@ namespace CSharpPractice5.Models
 
         #region Properties
 
-        
-        public string Name
-        {
-            get { return _name; }
-            set { _name = value; }
-        }
 
-        public int Id
-        {
-            get { return _id; }
-            set { _id = value; }
-        }
+        public string Name { get; }
+
+        public int Id { get; }
 
         public string IsActive
         {
@@ -62,49 +46,24 @@ namespace CSharpPractice5.Models
             //    return "Active";
 
             //}
-            
-
     }
 
-        public double CpuPercent
-        {
-            get { return _cpuPercent; }
-        }
+        public double CpuPercent { get; private set; }
 
-        public double MemoryPercent
-        {
-            get { return _memoryPercent; }
-        }
+        public double MemoryPercent { get; private set; }
 
-        public double MemoryVolume
-        {
-            get { return _memoryVolume; }
-        }
+        public double MemoryVolume { get; private set; }
 
-        public int Threads
-        {
-            get { return _process.Threads.Count; }
-        }
+        public int Threads { get; private set; }
 
-        public string UserName
-        {
-            get { return _userName; }
-        }
+        public string UserName { get; }
 
-        public string FileName
-        {
-            get { return _fileName; }
-        }
+        public string FileName { get; }
 
-        public string FilePath
-        {
-            get { return _filePath; }
-        }
+        public string FilePath { get; }
 
-        public string StartTime
-        {
-            get { return _startTime.ToString(); }
-        }
+        public string StartTime{ get; }
+        
 
         #endregion
 
@@ -114,21 +73,27 @@ namespace CSharpPractice5.Models
         public SystemProcess(Process process)
         {
             _process = process;
-            _name = _process.ProcessName;
-            _id = _process.Id;
-            _userName = _process.StartInfo.UserName;
-            _filePath = _process.MainModule.FileName;
-            _fileName = _filePath.Substring(_filePath.LastIndexOf('\\')+1);
-            _startTime = _process.StartTime;
-            _userName = GetOwner();
+            Name = _process.ProcessName;
+            Id = _process.Id;
+            UserName = _process.StartInfo.UserName;
+            FilePath = _process.MainModule.FileName;
+            FileName = FilePath.Substring(FilePath.LastIndexOf('\\')+1);
+            StartTime = _process.StartTime.ToString();
+            UserName = GetOwner();
+            _memoryCounter = new PerformanceCounter("Process", "Private Bytes", Name, true);
+            _cpuCounter = new PerformanceCounter("Process", "% Processor Time", Name, true);
             Refresh();
         }
 
         #endregion
 
+
+        #region Helping functions
+
+        
         private string GetOwner()
         {
-            string query = "Select * From Win32_Process Where ProcessID = " + _id;
+            string query = "Select * From Win32_Process Where ProcessID = " + Id;
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
             ManagementObjectCollection processList = searcher.Get();
             ManagementObject obj = processList.OfType<ManagementObject>().FirstOrDefault();
@@ -143,14 +108,14 @@ namespace CSharpPractice5.Models
 
         private void Refresh()
         {
-            PerformanceCounter memoryCounter = new PerformanceCounter("Process", "Private Bytes", _name, true);
-            _memoryVolume = Convert.ToInt32(memoryCounter.NextValue()) / (int) (1024 * 1024);
-            _memoryPercent = Math.Round((_memoryVolume / ComputerHelper.TotalRAM) * 100,2);
-            PerformanceCounter cpuCounter  = new PerformanceCounter("Process", "% Processor Time", _name,true);
-            _cpuPercent = Convert.ToInt32(cpuCounter.NextValue()/Environment.ProcessorCount);
-            
+            MemoryVolume = Convert.ToInt32(_memoryCounter.NextValue()) / (int) (1024 * 1024);
+            MemoryPercent = Math.Round((MemoryVolume / ComputerHelper.TotalRAM) * 100,2);
+            CpuPercent = Convert.ToInt32(_cpuCounter.NextValue()/Environment.ProcessorCount);
+            Threads = _process.Threads.Count;
         }
+        
+        #endregion
     }
-    
+
 }
 
