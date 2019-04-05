@@ -5,11 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CSharpPractice5.Views"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="550" d:DesignWidth="800">
     <Grid>
-        <DataGrid IsReadOnly="True"  ItemsSource="{Binding Processes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" ColumnWidth ="*"  AutoGenerateColumns="False" SelectedItem ="{Binding SelectedProcess, Mode = TwoWay}" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="10*"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <DataGrid Grid.Row="1" IsReadOnly="True"  ItemsSource="{Binding Processes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" ColumnWidth ="*"  AutoGenerateColumns="False" SelectedItem ="{Binding SelectedProcess, Mode = TwoWay}" >
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Name"  Binding="{Binding Name}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Name" Width="Auto"  Binding="{Binding Name}"></DataGridTextColumn>
                 <DataGridTextColumn Header="id" Binding="{Binding Id}"></DataGridTextColumn>
                 <DataGridTextColumn Header ="Active" Binding ="{Binding IsActive}"></DataGridTextColumn>
                 <DataGridTextColumn Header ="CPU%"  Binding ="{Binding CpuPercent}"></DataGridTextColumn>
@@ -17,10 +22,11 @@
                 <DataGridTextColumn Header="Memory" Binding="{Binding MemoryVolume}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Threads" Binding="{Binding Threads}"></DataGridTextColumn>
                 <DataGridTextColumn Header="User" Binding="{Binding UserName}"></DataGridTextColumn>
-                <DataGridTextColumn Header="File" Binding="{Binding FileName}"></DataGridTextColumn>
+                <DataGridTextColumn Header="File" Width="Auto" Binding="{Binding FileName}"></DataGridTextColumn>
                 <DataGridTextColumn Header="Path" Binding="{Binding FilePath}"></DataGridTextColumn>
-                <DataGridTextColumn Header="Started" Binding="{Binding StartTime}"></DataGridTextColumn>
+                <DataGridTextColumn Header="Started" Width="Auto" Binding="{Binding StartTime}"></DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
+        <Button Grid.Row="2" Content ="Terminate" MinWidth="120" Padding="10, 0" FontSize="14" HorizontalAlignment ="Center" Margin="0,5" Command ="{Binding TerminateProcessCommand}" Background="WhiteSmoke" Foreground="MidnightBlue"></Button>
     </Grid>
 </UserControl>

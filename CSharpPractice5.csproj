@@ -61,6 +61,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Tools\ComputerHelper.cs" />
+    <Compile Include="Tools\RelayCommand.cs" />
+    <Compile Include="Tools\StationManager.cs" />
     <Compile Include="ViewModels\ProcessListViewModel.cs" />
     <Compile Include="Views\ProcessListView.xaml.cs">
       <DependentUpon>ProcessListView.xaml</DependentUpon>

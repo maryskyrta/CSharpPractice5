@@ -27,26 +27,26 @@ namespace CSharpPractice5.Models
 
         public string IsActive
         {
-            get
-            {
-                if (_process.Responding)
-                    return "Responding";
-                return "Not responding";
-            }
             //get
             //{
-            //    try
-            //    {
-            //        Process.GetProcessById(_id);
-            //    }
-            //    catch(Exception e)
-            //    {
-            //        return "Not active";
-            //    }
-            //    return "Active";
-
+            //    if (_process.Responding)
+            //        return "Responding";
+            //    return "Not responding";
             //}
-    }
+            get
+            {
+                try
+                {
+                    Process.GetProcessById(Id);
+                }
+                catch (Exception e)
+                {
+                    return "Not active";
+                }
+                return "Active";
+
+            }
+        }
 
         public double CpuPercent { get; private set; }
 
@@ -76,9 +76,24 @@ namespace CSharpPractice5.Models
             Name = _process.ProcessName;
             Id = _process.Id;
             UserName = _process.StartInfo.UserName;
-            FilePath = _process.MainModule.FileName;
+
+            try
+            {
+                FilePath = _process.MainModule.FileName;
+                StartTime = _process.StartTime.ToString();
+            }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                FilePath = "Undefined";
+                StartTime = "Undefined";
+            }
+            catch (System.InvalidOperationException)
+            {
+                FilePath = "Undefined";
+                StartTime = "Undefined";
+            }
+
             FileName = FilePath.Substring(FilePath.LastIndexOf('\\')+1);
-            StartTime = _process.StartTime.ToString();
             UserName = GetOwner();
             _memoryCounter = new PerformanceCounter("Process", "Private Bytes", Name, true);
             _cpuCounter = new PerformanceCounter("Process", "% Processor Time", Name, true);
@@ -97,16 +112,20 @@ namespace CSharpPractice5.Models
             ManagementObjectSearcher searcher = new ManagementObjectSearcher(query);
             ManagementObjectCollection processList = searcher.Get();
             ManagementObject obj = processList.OfType<ManagementObject>().FirstOrDefault();
-            string[] argList = new string[] {string.Empty, string.Empty};
-            int returnVal = Convert.ToInt32(obj.InvokeMethod("GetOwner", argList));
-            if (returnVal == 0)
+            if (obj != null)
             {
-                return argList[0];
+                string[] argList = new string[] {string.Empty, string.Empty};
+                int returnVal = Convert.ToInt32(obj.InvokeMethod("GetOwner", argList));
+                if (returnVal == 0)
+                {
+                    return argList[0];
+                }
             }
-            return "Not defined";
+
+            return "Undefined";
         }
 
-        private void Refresh()
+        public void Refresh()
         {
             MemoryVolume = Convert.ToInt32(_memoryCounter.NextValue()) / (int) (1024 * 1024);
             MemoryPercent = Math.Round((MemoryVolume / ComputerHelper.TotalRAM) * 100,2);

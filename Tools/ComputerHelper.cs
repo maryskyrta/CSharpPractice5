@@ -22,7 +22,6 @@ namespace CSharpPractice5.Tools
                 double res = Convert.ToDouble(result["TotalVisibleMemorySize"]);
                 double fres = Math.Round((res / 1024), 2);
                 TotalRAM = fres;
-                MessageBox.Show($"{fres}");
             }
         }
     }
