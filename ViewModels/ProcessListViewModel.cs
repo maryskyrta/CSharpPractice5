@@ -13,11 +13,13 @@ using CSharpPractice5.Tools;
 
 namespace CSharpPractice5.ViewModels
 {
-    internal class ProcessListViewModel:INotifyPropertyChanged
+    internal class ProcessListViewModel:INotifyPropertyChanged, ILoaderOwner
     {
 
         #region Fields
 
+        private Visibility _loaderVisibility = Visibility.Hidden;
+        private bool _isControlEnabled = true;
         private ObservableCollection<SystemProcessModule> _processModules;
         private ObservableCollection<SystemProcessThread> _processThreads;
         private string _sortBy;
@@ -33,6 +35,26 @@ namespace CSharpPractice5.ViewModels
         #endregion
 
         #region Properties
+
+        public Visibility LoaderVisibility
+        {
+            get { return _loaderVisibility; }
+            set
+            {
+                _loaderVisibility = value;
+                OnPropertyChanged();
+            }
+        }
+        public bool IsControlEnabled
+        {
+            get { return _isControlEnabled; }
+            set
+            {
+                _isControlEnabled = value;
+                OnPropertyChanged();
+            }
+        }
+
 
         public SystemProcess SelectedProcess
         {
@@ -127,6 +149,7 @@ namespace CSharpPractice5.ViewModels
 
         public ProcessListViewModel()
         {
+            LoaderManager.Instance.Initialize(this);
             ComputerHelper.Initialize();
             _processes = new ObservableCollection<SystemProcess>();
             var pros = Process.GetProcesses();
@@ -194,11 +217,21 @@ namespace CSharpPractice5.ViewModels
             {
                 var pros = Process.GetProcesses();
                 var processes = pros.Select(process => new SystemProcess(process)).ToList();
+                LoaderManager.Instance.ShowLoader();
                 SortProcesses(ref processes);
                 Processes = new ObservableCollection<SystemProcess>(processes);
+                for (int j = 0; j < 2; j++)
+                {
+                    Thread.Sleep(500);
+                    if (_token.IsCancellationRequested)
+                        break;
+                }
                 if (_token.IsCancellationRequested)
                     break;
-                for (int j = 0; j < 10; j++)
+                LoaderManager.Instance.HideLoader();
+                if (_token.IsCancellationRequested)
+                    break;
+                for (int j = 0; j < 3; j++)
                 {
                     Thread.Sleep(500);
                     if (_token.IsCancellationRequested)

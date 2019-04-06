@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:CSharpPractice5.Views"
+             xmlns:fa="http://schemas.fontawesome.io/icons/"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="850">
     <Grid>
@@ -51,6 +52,8 @@
         </Expander>
         <Button Grid.Row="3" Grid.Column="0" Content ="Open source folder" Padding="10 0" FontSize="14" HorizontalAlignment ="Center" Margin="0 5" Command ="{Binding OpenSourceFolderCommand}" Background="WhiteSmoke" Foreground="MidnightBlue"></Button>
         <Button Grid.Row="3" Grid.Column="1" Content ="Terminate" MinWidth="120" Padding="10 0" FontSize="14" HorizontalAlignment ="Center" Margin="0 5" Command ="{Binding TerminateProcessCommand}" Background="WhiteSmoke" Foreground="MidnightBlue"></Button>
-
+        <fa:ImageAwesome Name="_loader"   Icon="Asterisk" Width="50" Height="50" Spin="True" Visibility="{Binding LoaderVisibility, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Grid.ColumnSpan="2" Margin="400,165,400,158" Grid.Row="1" >
+            
+        </fa:ImageAwesome>
     </Grid>
 </UserControl>
