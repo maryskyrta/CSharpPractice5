@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
-using System.Threading;
 using CSharpPractice5.Tools;
 
 namespace CSharpPractice5.Models
@@ -13,12 +11,10 @@ namespace CSharpPractice5.Models
     {
         #region Fields
         
-
         private readonly Process _process;
         private readonly PerformanceCounter _memoryCounter;
         private readonly PerformanceCounter _cpuCounter;
-
-
+        
         #endregion
 
 
@@ -31,12 +27,6 @@ namespace CSharpPractice5.Models
 
         public string IsActive
         {
-            //get
-            //{
-            //    if (_process.Responding)
-            //        return "Responding";
-            //    return "Not responding";
-            //}
             get
             {
                 try
@@ -86,19 +76,14 @@ namespace CSharpPractice5.Models
                 FilePath = _process.MainModule.FileName;
                 StartTime = _process.StartTime.ToString();
             }
-            catch (System.ComponentModel.Win32Exception)
+            catch (Exception ex)
             {
                 FilePath = "Undefined";
                 StartTime = "Undefined";
             }
-            catch (System.InvalidOperationException)
-            {
-                FilePath = "Undefined";
-                StartTime = "Undefined";
-            }
-
             FileName = FilePath.Substring(FilePath.LastIndexOf('\\')+1);
             UserName = GetOwner();
+            Threads = _process.Threads.Count;
             _memoryCounter = new PerformanceCounter("Process", "Private Bytes", Name, true);
             _cpuCounter = new PerformanceCounter("Process", "% Processor Time", Name, true);
             Refresh();
@@ -133,26 +118,20 @@ namespace CSharpPractice5.Models
         {
             try
             {
-                Threads = _process.Threads.Count;
                 MemoryVolume = Convert.ToInt32(_memoryCounter.NextValue()) / (int) (1024 * 1024);
                 MemoryPercent = Math.Round((MemoryVolume / ComputerHelper.TotalRAM) * 100, 2);
-                CpuPercent = Convert.ToInt32(_cpuCounter.NextValue() / Environment.ProcessorCount);
+                CpuPercent = Math.Round(_cpuCounter.NextValue() / Environment.ProcessorCount,2);
             }
             catch(System.InvalidOperationException)
             {
 
             }
-
-            Threads = _process.Threads.Count;
         }
 
         public void Terminate()
         {
             if(IsActive=="Active")
-            _process.Kill();
-            //_process.Dispose();
-            //_memoryCounter.Dispose();
-            //_cpuCounter.Dispose();
+                _process.Kill();
         }
 
         public ProcessThreadCollection ProcessThreads()

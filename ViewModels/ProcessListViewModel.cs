@@ -68,6 +68,11 @@ namespace CSharpPractice5.ViewModels
                     DisplayThreads();
                     DisplayModules();
                 }
+                else if (_selectedProcess != null)
+                {
+                    DisplayThreads();
+                    DisplayModules();
+                }
 
                 OnPropertyChanged();
             }
@@ -215,9 +220,23 @@ namespace CSharpPractice5.ViewModels
             int i = 0;
             while (!_token.IsCancellationRequested)
             {
-                var pros = Process.GetProcesses();
-                var processes = pros.Select(process => new SystemProcess(process)).ToList();
                 LoaderManager.Instance.ShowLoader();
+                var pros = Process.GetProcesses();
+                var processes = new List<SystemProcess>();
+                foreach (var proc in pros)
+                {
+                    var existing = new List<SystemProcess>(from process in _processes
+                        where process.Id == proc.Id
+                        select process);
+                    if (existing.Count > 0)
+                    {
+                        processes.Add(existing.First());
+                    }
+                    else
+                    {
+                        processes.Add(new SystemProcess(proc));
+                    }
+                }
                 SortProcesses(ref processes);
                 Processes = new ObservableCollection<SystemProcess>(processes);
                 for (int j = 0; j < 2; j++)
@@ -231,7 +250,7 @@ namespace CSharpPractice5.ViewModels
                 LoaderManager.Instance.HideLoader();
                 if (_token.IsCancellationRequested)
                     break;
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j < 10; j++)
                 {
                     Thread.Sleep(500);
                     if (_token.IsCancellationRequested)
