@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
+using System.Threading;
 using CSharpPractice5.Tools;
 
 namespace CSharpPractice5.Models
@@ -9,6 +11,7 @@ namespace CSharpPractice5.Models
     internal class SystemProcess
     {
         #region Fields
+        
 
         private readonly Process _process;
         private readonly PerformanceCounter _memoryCounter;
@@ -129,6 +132,7 @@ namespace CSharpPractice5.Models
         {
             try
             {
+                Threads = _process.Threads.Count;
                 MemoryVolume = Convert.ToInt32(_memoryCounter.NextValue()) / (int) (1024 * 1024);
                 MemoryPercent = Math.Round((MemoryVolume / ComputerHelper.TotalRAM) * 100, 2);
                 CpuPercent = Convert.ToInt32(_cpuCounter.NextValue() / Environment.ProcessorCount);
@@ -140,7 +144,25 @@ namespace CSharpPractice5.Models
 
             Threads = _process.Threads.Count;
         }
-        
+
+        public void Terminate()
+        {
+            _process.Kill();
+            //_process.Dispose();
+            //_memoryCounter.Dispose();
+            //_cpuCounter.Dispose();
+        }
+
+        public ProcessThreadCollection ProcessThreads()
+        {
+            return _process.Threads;
+        }
+
+        public ProcessModuleCollection ProcessModules()
+        {
+            return _process.Modules;
+        }
+
         #endregion
     }
 

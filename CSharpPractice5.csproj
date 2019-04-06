@@ -60,6 +60,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\SystemProcessModule.cs" />
+    <Compile Include="Models\SystemProcessThread.cs" />
     <Compile Include="Tools\ComputerHelper.cs" />
     <Compile Include="Tools\RelayCommand.cs" />
     <Compile Include="Tools\StationManager.cs" />

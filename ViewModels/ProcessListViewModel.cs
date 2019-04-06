@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -17,10 +18,13 @@ namespace CSharpPractice5.ViewModels
 
         #region Fields
 
+        private ObservableCollection<SystemProcessModule> _processModules;
+        private ObservableCollection<SystemProcessThread> _processThreads;
         private string _sortBy;
         private ObservableCollection<SystemProcess> _processes;
         private SystemProcess _selectedProcess;
         private RelayCommand<object> _terminateProcess;
+        private RelayCommand<object> _openSourceFolder;
         private Task _listRefreshTask;
         private Task _processesRefreshTask;
         private readonly CancellationToken _token;
@@ -36,6 +40,8 @@ namespace CSharpPractice5.ViewModels
             set
             {
                 _selectedProcess = value;
+                DisplayThreads();
+                DisplayModules();
                 OnPropertyChanged();
             }
         }
@@ -80,11 +86,33 @@ namespace CSharpPractice5.ViewModels
 
         public RelayCommand<object> TerminateProcessCommand
         {
-            get { return _terminateProcess ?? (_terminateProcess = new RelayCommand<object>(TerminateProcess, CanTerminateProcess)); }
+            get { return _terminateProcess ?? (_terminateProcess = new RelayCommand<object>(TerminateProcess, CanProcessCommandExecute)); }
         }
 
-        
-        
+        public RelayCommand<object> OpenSourceFolderCommand
+        {
+            get { return _openSourceFolder ?? (_openSourceFolder = new RelayCommand<object>(OpenSourceFolder, CanProcessCommandExecute)) ; }
+        }
+
+        public ObservableCollection<SystemProcessThread> ProcessThreads
+        {
+            get { return _processThreads; }
+            set
+            {
+                _processThreads = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<SystemProcessModule> ProcessModules
+        {
+            get { return _processModules; }
+            set
+            {
+                _processModules = value; 
+                OnPropertyChanged();
+            }
+        }
 
         #endregion
 
@@ -101,6 +129,8 @@ namespace CSharpPractice5.ViewModels
             {
                 _processes.Add(new SystemProcess(process));
             }
+            _processThreads = new ObservableCollection<SystemProcessThread>();
+            _processModules = new ObservableCollection<SystemProcessModule>();
             _tokenSource = new CancellationTokenSource();
             _token = _tokenSource.Token;
             StartBackgroundTasks();
@@ -115,11 +145,31 @@ namespace CSharpPractice5.ViewModels
 
         private void TerminateProcess(object obj)
         {
-            MessageBox.Show($"{SelectedProcess.Name}");
-            //TODO implement process termination
+            try
+            {
+                _selectedProcess.Terminate();
+                SelectedProcess = null;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
 
-        private bool CanTerminateProcess(object obj)
+        private void OpenSourceFolder(object obj)
+        {
+            try
+            {
+                string path = _selectedProcess.FilePath.Substring(0, _selectedProcess.FilePath.LastIndexOf('\\'));
+                Process.Start("explorer", path);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Source folder cannot be opened");
+            }
+        }
+
+        private bool CanProcessCommandExecute(object obj)
         {
             return SelectedProcess!=null;
         }
@@ -252,6 +302,34 @@ namespace CSharpPractice5.ViewModels
                 default:
                     return;
             }
+        }
+
+        private void DisplayThreads()
+        {
+            if (_selectedProcess != null||_selectedProcess.IsActive == "Not active")
+            {
+                var threads = new List<SystemProcessThread>();
+                foreach (var thread in _selectedProcess.ProcessThreads())
+                {
+                    threads.Add(new SystemProcessThread((ProcessThread) thread));
+                }
+                ProcessThreads = new ObservableCollection<SystemProcessThread>(threads);
+            }
+            else ProcessThreads = new ObservableCollection<SystemProcessThread>();
+        }
+
+        private void DisplayModules()
+        {
+            if (_selectedProcess != null||_selectedProcess.IsActive=="Not active")
+            {
+                var modules = new List<SystemProcessModule>();
+                foreach (var module in _selectedProcess.ProcessModules())
+                {
+                    modules.Add(new SystemProcessModule((ProcessModule)module));
+                }
+                ProcessModules = new ObservableCollection<SystemProcessModule>(modules);
+            }
+            else ProcessModules = new ObservableCollection<SystemProcessModule>();
         }
 
         #endregion
