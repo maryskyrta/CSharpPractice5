@@ -39,9 +39,14 @@ namespace CSharpPractice5.ViewModels
             get { return _selectedProcess;}
             set
             {
+                var sel = _selectedProcess;
                 _selectedProcess = value;
-                DisplayThreads();
-                DisplayModules();
+                if (sel!=null&&_selectedProcess!=null&&sel.Id != _selectedProcess.Id)
+                {
+                    DisplayThreads();
+                    DisplayModules();
+                }
+
                 OnPropertyChanged();
             }
         }
@@ -149,10 +154,12 @@ namespace CSharpPractice5.ViewModels
             {
                 _selectedProcess.Terminate();
                 SelectedProcess = null;
+                ProcessThreads = new ObservableCollection<SystemProcessThread>();
+                ProcessModules =  new ObservableCollection<SystemProcessModule>();
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show("This process cannot be terminated");
             }
         }
 
@@ -306,7 +313,7 @@ namespace CSharpPractice5.ViewModels
 
         private void DisplayThreads()
         {
-            if (_selectedProcess != null||_selectedProcess.IsActive == "Not active")
+            if (_selectedProcess != null&&_selectedProcess.IsActive == "Active")
             {
                 var threads = new List<SystemProcessThread>();
                 foreach (var thread in _selectedProcess.ProcessThreads())
@@ -320,7 +327,7 @@ namespace CSharpPractice5.ViewModels
 
         private void DisplayModules()
         {
-            if (_selectedProcess != null||_selectedProcess.IsActive=="Not active")
+            if (_selectedProcess != null&&_selectedProcess.IsActive=="Active"&&_selectedProcess.ProcessModules()!=null)
             {
                 var modules = new List<SystemProcessModule>();
                 foreach (var module in _selectedProcess.ProcessModules())

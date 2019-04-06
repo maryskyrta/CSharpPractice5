@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Management;
@@ -147,6 +148,7 @@ namespace CSharpPractice5.Models
 
         public void Terminate()
         {
+            if(IsActive=="Active")
             _process.Kill();
             //_process.Dispose();
             //_memoryCounter.Dispose();
@@ -160,7 +162,14 @@ namespace CSharpPractice5.Models
 
         public ProcessModuleCollection ProcessModules()
         {
-            return _process.Modules;
+            try
+            {
+                return _process.Modules;
+            }
+            catch (Win32Exception)
+            {
+                return null;
+            }
         }
 
         #endregion

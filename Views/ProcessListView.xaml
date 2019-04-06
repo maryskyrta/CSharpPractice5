@@ -51,6 +51,6 @@
         </Expander>
         <Button Grid.Row="3" Grid.Column="0" Content ="Open source folder" Padding="10 0" FontSize="14" HorizontalAlignment ="Center" Margin="0 5" Command ="{Binding OpenSourceFolderCommand}" Background="WhiteSmoke" Foreground="MidnightBlue"></Button>
         <Button Grid.Row="3" Grid.Column="1" Content ="Terminate" MinWidth="120" Padding="10 0" FontSize="14" HorizontalAlignment ="Center" Margin="0 5" Command ="{Binding TerminateProcessCommand}" Background="WhiteSmoke" Foreground="MidnightBlue"></Button>
-        
+
     </Grid>
 </UserControl>
